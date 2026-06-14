@@ -1,0 +1,142 @@
+name: IDnow API Test Automation
+
+# ── When does this pipeline run? ──────────────────────────────────────────────
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run nightly at 02:00 UTC — catches sandbox drift
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+    # Allow manual trigger from GitHub UI
+    inputs:
+      test_marker:
+        description: "pytest marker to run (leave blank for all)"
+        required: false
+        default: ""
+
+# ── Jobs ───────────────────────────────────────────────────────────────────────
+jobs:
+  api-tests:
+    name: "API Tests — Python ${{ matrix.python-version }}"
+    runs-on: ubuntu-latest
+
+    # Matrix: run tests on multiple Python versions simultaneously
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+      fail-fast: false    # Both versions run even if one fails
+
+    steps:
+      # ── 1. Get the code ───────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Set up Python ──────────────────────────────────────────────────
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"      # Cache pip downloads for faster runs
+
+      # ── 3. Install dependencies ───────────────────────────────────────────
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install httpx pytest pytest-asyncio pytest-xdist allure-pytest \
+                      pydantic pydantic-settings tenacity jsonschema \
+                      python-dotenv pytest-cov Pillow
+
+      # ── 4. Verify installation ────────────────────────────────────────────
+      - name: Verify setup
+        run: |
+          python -c "import httpx, pytest, pydantic, tenacity; print('deps OK')"
+          pytest --version
+        env:
+          PYTHONPATH: src
+
+      # ── 5. Run test suite ─────────────────────────────────────────────────
+      - name: Run API test suite
+        run: |
+          MARKER=""
+          if [ -n "${{ github.event.inputs.test_marker }}" ]; then
+            MARKER="-m ${{ github.event.inputs.test_marker }}"
+          fi
+          python -m pytest $MARKER \
+            --tb=short \
+            --alluredir=reports/allure-results \
+            --junitxml=reports/junit.xml \
+            -v \
+            2>&1 | tee reports/test-output.log
+        env:
+          PYTHONPATH: src
+          # ── Secrets injected from GitHub → Settings → Secrets ────────────
+          IDNOW_USERNAME:          ${{ secrets.IDNOW_USERNAME }}
+          IDNOW_PASSWORD:          ${{ secrets.IDNOW_PASSWORD }}
+          IDNOW_OAUTH_CLIENT_ID:   cis-api-client
+          IDNOW_REALM:             ariadnext-idcheck-sandbox
+          IDNOW_ENV:               sandbox
+          IDNOW_POLL_TIMEOUT_SECONDS: 180
+          IDNOW_POLL_INTERVAL_SECONDS: 5
+          LOG_LEVEL:               INFO
+
+      # ── 6. Upload Allure results ──────────────────────────────────────────
+      - name: Upload Allure results
+        uses: actions/upload-artifact@v4
+        if: always()    # Upload even if tests fail — essential for debugging
+        with:
+          name: allure-results-py${{ matrix.python-version }}
+          path: reports/allure-results/
+          retention-days: 30
+
+      # ── 7. Upload JUnit XML ───────────────────────────────────────────────
+      - name: Upload JUnit XML report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: junit-report-py${{ matrix.python-version }}
+          path: reports/junit.xml
+          retention-days: 30
+
+      # ── 8. Upload test log ────────────────────────────────────────────────
+      - name: Upload test output log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-log-py${{ matrix.python-version }}
+          path: reports/test-output.log
+          retention-days: 7
+
+  # ── Optional: publish Allure HTML report to GitHub Pages ─────────────────────
+  publish-report:
+    name: "Publish Allure Report"
+    needs: api-tests
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && always()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Allure results (py3.11)
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-py3.11
+          path: allure-results/
+
+      - name: Generate Allure HTML report
+        uses: simple-elf/allure-report-action@master
+        with:
+          allure_results: allure-results
+          allure_report: allure-report
+          allure_history: allure-history
+
+      - name: Publish report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-report

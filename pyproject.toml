@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "idnow-api-automation"
+version = "1.0.0"
+description = "Production-grade API test automation framework for IDnow IDcheck API"
+requires-python = ">=3.11"
+dependencies = [
+    # HTTP client — async-native, cleaner API than requests, connection pooling built-in
+    "httpx>=0.27",
+    # Test runner — fixture-based DI, parametrize, plugins ecosystem
+    "pytest>=8.2",
+    # Async test support — needed if we ever add async tests
+    "pytest-asyncio>=0.23",
+    # Parallel test execution — cuts CI wall-clock time
+    "pytest-xdist>=3.5",
+    # Allure reporting — industry-standard rich HTML reports
+    "allure-pytest>=2.13",
+    # Data validation & settings management — strict typing, env-var parsing
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    # Retry / polling — declarative backoff, cleaner than while-loops
+    "tenacity>=8.3",
+    # JSON Schema contract validation against OpenAPI component schemas
+    "jsonschema>=4.22",
+    # Environment variable loading from .env files
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest-cov>=5.0",
+    "black>=24.0",
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "pre-commit>=3.7",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# ── pytest ────────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths       = ["tests"]
+pythonpath      = ["src"]
+addopts         = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--alluredir=reports/allure-results",
+    "--color=yes",
+]
+markers = [
+    "happy_path: happy path end-to-end flows",
+    "field_assertions: extracted field value checks",
+    "error_cases: negative / error-handling scenarios",
+    "contract: OpenAPI schema conformance tests",
+    "slow: tests that poll and take >10 s",
+]
+asyncio_mode = "auto"
+
+# ── ruff (linting) ────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+# ── black (formatting) ────────────────────────────────────────────────────────
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+# ── mypy ─────────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true

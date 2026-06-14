@@ -1,0 +1,63 @@
+# ─── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+eggs/
+parts/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ─── Virtual environments ──────────────────────────────────────────────────────
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ─── CRITICAL: secrets — never commit ────────────────────────────────────────
+.env
+*.secret
+secrets.yml
+secrets.yaml
+
+# ─── Test / coverage ──────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# ─── Allure reports — generated, not source-controlled ───────────────────────
+reports/allure-results/
+reports/allure-html/
+reports/junit.xml
+reports/test-output.log
+
+# ─── IDEs ─────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# ─── mypy ─────────────────────────────────────────────────────────────────────
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ─── ruff ─────────────────────────────────────────────────────────────────────
+.ruff_cache/
+reports/allure-results/*
