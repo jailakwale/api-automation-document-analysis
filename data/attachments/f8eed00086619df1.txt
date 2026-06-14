@@ -1,0 +1,2 @@
+17:50:15 | INFO     | httpx | HTTP Request: DELETE https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document/02c01517-5dc8-43a7-a015-70c70abccb4a?synchronous=true "HTTP/1.1 204 No Content"
+17:50:15 | INFO     | tests.conftest | [session fixture] Cleaned up document uid=02c01517-5dc8-43a7-a015-70c70abccb4a

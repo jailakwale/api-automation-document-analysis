@@ -1,0 +1,3 @@
+lastAnalysisStatus: OK
+prettyName: France Electronic National ID Card 2021
+classId: FRA_ID_1853

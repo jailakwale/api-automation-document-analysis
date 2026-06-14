@@ -1,0 +1,5 @@
+17:49:53 | INFO     | httpx | HTTP Request: POST https://sso.idcheck-sandbox.ariadnext.io/auth/realms/customer-identity/protocol/openid-connect/token "HTTP/1.1 200 OK"
+17:49:53 | INFO     | api_framework.auth.token_manager | Token obtained. Expires in 300s
+17:49:53 | INFO     | httpx | HTTP Request: POST https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/file?synchronous=true "HTTP/1.1 201 Created"
+17:49:54 | INFO     | httpx | HTTP Request: DELETE https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/file/3cc8be21-7c38-4786-82c0-884eb9db57a4?synchronous=true "HTTP/1.1 403 Forbidden"
+17:49:54 | WARNING  | api_framework.clients.idcheck_client | DELETE file/3cc8be21-7c38-4786-82c0-884eb9db57a4 returned 403 — sandbox permission restriction. Skipping cleanup.

@@ -1,0 +1,1 @@
+[32mINFO    [0m httpx:_client.py:1025 HTTP Request: GET https://api.idcheck-sandbox.ariadnext.io/gw/cis/api/swagger.json "HTTP/1.1 200 OK"

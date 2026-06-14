@@ -1,0 +1,2 @@
+Status: 415
+Body: {"errorCode":"CIS_API_INVALID_CONTENT","errorMessage":"Image is not base64 encoded"}

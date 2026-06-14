@@ -1,0 +1,2 @@
+Status: 400
+Body: {"errorCode":"CIS_BAD_REQUEST","errorMessage":"Invalid value for field: type"}

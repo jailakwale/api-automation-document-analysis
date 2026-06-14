@@ -1,0 +1,2 @@
+[32mINFO    [0m httpx:_client.py:1025 HTTP Request: POST https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document?synchronous=true "HTTP/1.1 201 Created"
+[32mINFO    [0m httpx:_client.py:1025 HTTP Request: DELETE https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document/87fbbd6b-26ea-4157-9ef7-b24e65cd0692?synchronous=true "HTTP/1.1 204 No Content"
