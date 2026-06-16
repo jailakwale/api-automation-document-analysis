@@ -15,9 +15,9 @@ class Settings(BaseSettings):
     )
 
     # OAuth2 ROPC credentials
-    username: str = Field(default="candidate.2@idnow.io")
+    username: str = Field(...)
     password: str = Field(...)
-    oauth_client_id: str = Field(default="cis-api-client")
+    oauth_client_id: str = Field(...)
 
     # Realm & environment
     realm: str = Field(default="ariadnext-idcheck-sandbox")
