@@ -1,1 +1,0 @@
-uid='b4648306-02e3-4e8a-8a7e-a4e18758cc07' status='SUBMITTED' issuerUid='candidate.2@idnow.io' issuerType='cis-api'

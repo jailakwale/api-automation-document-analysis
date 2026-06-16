@@ -1,0 +1,2 @@
+14:36:07 | INFO     | httpx | HTTP Request: POST https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document?synchronous=true "HTTP/1.1 201 Created"
+14:36:07 | INFO     | httpx | HTTP Request: POST https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document/8d49f7b8-441a-4a4a-8582-28e49a217f9f/check?synchronous=false&manualAnalysis=DISABLE "HTTP/1.1 202 Accepted"

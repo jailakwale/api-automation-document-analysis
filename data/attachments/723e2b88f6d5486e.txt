@@ -1,2 +1,0 @@
-17:50:13 | INFO     | httpx | HTTP Request: POST https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document?synchronous=true "HTTP/1.1 201 Created"
-17:50:13 | INFO     | httpx | HTTP Request: DELETE https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document/87fbbd6b-26ea-4157-9ef7-b24e65cd0692?synchronous=true "HTTP/1.1 204 No Content"

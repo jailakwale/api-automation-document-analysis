@@ -1,0 +1,9 @@
+14:35:52 | INFO     | httpx | HTTP Request: POST https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document?synchronous=true "HTTP/1.1 201 Created"
+14:35:52 | INFO     | tests.conftest | [session fixture] Document created: uid=2adf684c-50bb-4989-99f9-8c48297a3300
+14:35:52 | INFO     | httpx | HTTP Request: POST https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document/2adf684c-50bb-4989-99f9-8c48297a3300/check?synchronous=false&manualAnalysis=DISABLE "HTTP/1.1 202 Accepted"
+14:35:52 | INFO     | tests.conftest | [session fixture] Analysis triggered for uid=2adf684c-50bb-4989-99f9-8c48297a3300
+14:35:52 | INFO     | httpx | HTTP Request: GET https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document/2adf684c-50bb-4989-99f9-8c48297a3300 "HTTP/1.1 200 OK"
+14:35:52 | INFO     | api_framework.utils.polling | Polling attempt #1 — not yet complete, retrying...
+14:35:58 | INFO     | httpx | HTTP Request: GET https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document/2adf684c-50bb-4989-99f9-8c48297a3300 "HTTP/1.1 200 OK"
+14:35:58 | INFO     | tests.conftest | [session fixture] Analysis complete: globalStatus=OK prettyName=France Electronic National ID Card 2021
+14:35:59 | INFO     | httpx | HTTP Request: GET https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document/2adf684c-50bb-4989-99f9-8c48297a3300 "HTTP/1.1 200 OK"

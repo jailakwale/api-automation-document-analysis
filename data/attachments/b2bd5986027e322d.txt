@@ -1,0 +1,9 @@
+[32mINFO    [0m httpx:_client.py:1025 HTTP Request: POST https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document?synchronous=true "HTTP/1.1 201 Created"
+[32mINFO    [0m tests.conftest:conftest.py:88 [session fixture] Document created: uid=2adf684c-50bb-4989-99f9-8c48297a3300
+[32mINFO    [0m httpx:_client.py:1025 HTTP Request: POST https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document/2adf684c-50bb-4989-99f9-8c48297a3300/check?synchronous=false&manualAnalysis=DISABLE "HTTP/1.1 202 Accepted"
+[32mINFO    [0m tests.conftest:conftest.py:92 [session fixture] Analysis triggered for uid=2adf684c-50bb-4989-99f9-8c48297a3300
+[32mINFO    [0m httpx:_client.py:1025 HTTP Request: GET https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document/2adf684c-50bb-4989-99f9-8c48297a3300 "HTTP/1.1 200 OK"
+[32mINFO    [0m api_framework.utils.polling:polling.py:22 Polling attempt #1 — not yet complete, retrying...
+[32mINFO    [0m httpx:_client.py:1025 HTTP Request: GET https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document/2adf684c-50bb-4989-99f9-8c48297a3300 "HTTP/1.1 200 OK"
+[32mINFO    [0m tests.conftest:conftest.py:101 [session fixture] Analysis complete: globalStatus=OK prettyName=France Electronic National ID Card 2021
+[32mINFO    [0m httpx:_client.py:1025 HTTP Request: GET https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document/2adf684c-50bb-4989-99f9-8c48297a3300 "HTTP/1.1 200 OK"

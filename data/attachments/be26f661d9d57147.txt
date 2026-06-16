@@ -1,1 +1,0 @@
-17:50:08 | INFO     | httpx | HTTP Request: GET https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document/some-uid "HTTP/1.1 401 Unauthorized"

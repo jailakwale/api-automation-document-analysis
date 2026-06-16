@@ -1,1 +1,0 @@
-{'uid': '3cc8be21-7c38-4786-82c0-884eb9db57a4', 'owner': 'candidate.2@idnow.io', 'creationDate': '2026-06-14T19:49:53+0200', 'lastUpdateDate': '2026-06-14T19:49:53+0200', 'lastReportStatus': 'NONE', 'validity': 'NOT_VALIDATED', 'state': 'INITIAL'}

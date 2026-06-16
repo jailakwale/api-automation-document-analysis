@@ -1,1 +1,0 @@
-17:50:12 | INFO     | httpx | HTTP Request: POST https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document?synchronous=true "HTTP/1.1 415 Unsupported Media Type"

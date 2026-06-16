@@ -1,0 +1,2 @@
+[32mINFO    [0m httpx:_client.py:1025 HTTP Request: DELETE https://api.idcheck-sandbox.ariadnext.io/gw/cis/rest/v1/ariadnext-idcheck-sandbox/document/2adf684c-50bb-4989-99f9-8c48297a3300?synchronous=true "HTTP/1.1 204 No Content"
+[32mINFO    [0m tests.conftest:conftest.py:112 [session fixture] Cleaned up document uid=2adf684c-50bb-4989-99f9-8c48297a3300

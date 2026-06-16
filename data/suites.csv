@@ -1,31 +1,58 @@
 "DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
 "
-        GIVEN  an authenticated request
-        WHEN   I POST /document with a non-base64, non-image `data` value
-        THEN   the response is a client error (4xx)
+        GIVEN  no Authorization header
+        WHEN   I GET /rest/v1/{realm}/document/{uid}
+        THEN   the response status is 401 Unauthorized
 
-        The API must not accept clearly invalid image data and must not
-        return 500 (which would indicate unhandled server-side exception).
-        ","386","TC-EC-07: Create document with invalid image data returns error","tests.error_cases","2026-06-14","passed","2026-06-14","TestInvalidInputErrors","Error Cases","",""
+        This verifies that the API gateway enforces authentication and does
+        not expose data to unauthenticated callers.
+        ","566","TC-EC-01: Request without Authorization header returns 401","tests.error_cases","2026-06-16","passed","2026-06-16","TestAuthErrors","Error Cases","",""
 "
-        GIVEN a submitted document with analysis triggered
-        WHEN  polling until lastAnalysisStatus == OK
-        THEN  the document is complete and lastReport is populated
+        GIVEN a POST /file?synchronous=true request
+        WHEN  the response is 201 Created
+        THEN  the response body conforms to the FileSummary schema in swagger.json
+        ","2286","TC-CT-02: FileSummary response conforms to OpenAPI schema","tests.contract","2026-06-16","passed","2026-06-16","TestSchemaContract","Contract Testing","",""
+"
+        GIVEN a valid ID card image (recto + verso)
+        WHEN  POST /document?synchronous=true
+        THEN  201 Created with a non-empty UID string
+        ","1559","TC-HP-01: Create document returns 201 with a UID","tests.happy_path","2026-06-16","passed","2026-06-16","TestHappyPath","Happy Path","",""
+"
+        GIVEN  a request without authentication
+        WHEN   the API returns 401
+        THEN   the response body is valid JSON (not HTML or plain text)
 
-        The IDcheck API uses lastAnalysisStatus=""OK"" (not a ""FINAL"" state)
-        to signal that analysis is complete and results are available.
-        ","0","TC-HP-03: Analysis completes with lastAnalysisStatus=OK","tests.happy_path","2026-06-14","passed","2026-06-14","TestHappyPath","Happy Path","",""
+        Structured error responses are essential for client-side error handling.
+        An HTML error page or plain-text message would break API consumers.
+        ","800","TC-CT-05: Error response for unauthorised request is structured","tests.contract","2026-06-16","passed","2026-06-16","TestSchemaContract","Contract Testing","",""
+"
+        GIVEN the swagger.json URL
+        WHEN  I fetch it
+        THEN  it returns valid JSON with required OpenAPI fields
+        ","0","TC-CT-01: OpenAPI spec is fetchable and valid JSON","tests.contract","2026-06-16","passed","2026-06-16","TestSchemaContract","Contract Testing","",""
+"
+        GIVEN  a valid authenticated request
+        WHEN   I GET /document with a UID that does not exist
+        THEN   the response status is 404 Not Found
+
+        This verifies that the API does not return 200 with empty data
+        or 500 for unknown UIDs — a common API design smell.
+        ","564","TC-EC-04: GET non-existent document returns 404","tests.error_cases","2026-06-16","passed","2026-06-16","TestNotFoundErrors","Error Cases","",""
 "
         GIVEN  a valid authenticated request
         WHEN   I DELETE /document with a UID that does not exist
         THEN   the response status is 404 Not Found
-        ","491","TC-EC-05: Delete non-existent document returns 404","tests.error_cases","2026-06-14","passed","2026-06-14","TestNotFoundErrors","Error Cases","",""
+        ","592","TC-EC-05: Delete non-existent document returns 404","tests.error_cases","2026-06-16","passed","2026-06-16","TestNotFoundErrors","Error Cases","",""
 "
         GIVEN a completed analysis
-        WHEN  I read lastReport.info.expirationDate.value
-        THEN  it equals '11/02/2030'
-        AND   expirationDate.year = 2030 (document is not expired)
-        ","0","TC-FA-05: Expiration date = 11/02/2030","tests.field_assertions","2026-06-14","passed","2026-06-14","TestExtractedFields","Field Assertions","",""
+        WHEN  I read lastReport.info.documentNumber.value
+        THEN  it equals 'X4RTBPFW4' (as printed on the specimen card)
+        ","1","TC-FA-03: Extracted document number = X4RTBPFW4","tests.field_assertions","2026-06-16","passed","2026-06-16","TestExtractedFields","Field Assertions","",""
+"
+        GIVEN a completed analysis
+        WHEN  I read lastReport.info.extra[] where key starts with MRZ_LINE
+        THEN  MRZ line 3 contains 'MARTIN' and 'MAELYS'
+        ","1","TC-FA-06: MRZ lines are extracted and correct","tests.field_assertions","2026-06-16","passed","2026-06-16","TestExtractedFields","Field Assertions","",""
 "
         GIVEN  an authenticated request
         WHEN   I POST /document/{uid}/check with a non-existent UID
@@ -33,73 +60,22 @@
 
         Ensures the analysis trigger endpoint validates resource existence
         before starting expensive processing.
-        ","491","TC-EC-08: Trigger check on non-existent document returns 404","tests.error_cases","2026-06-14","passed","2026-06-14","TestInvalidInputErrors","Error Cases","",""
+        ","583","TC-EC-08: Trigger check on non-existent document returns 404","tests.error_cases","2026-06-16","passed","2026-06-16","TestInvalidInputErrors","Error Cases","",""
 "
-        GIVEN a POST /document?synchronous=true request
-        WHEN  the response is 201 Created
-        THEN  the response body conforms to DocumentSummary schema
-        ","1219","TC-CT-03: DocumentSummary response conforms to OpenAPI schema","tests.contract","2026-06-14","passed","2026-06-14","TestSchemaContract","Contract Testing","",""
-"
-        GIVEN  an Authorization header with a forged/invalid Bearer token
-        WHEN   I GET /rest/v1/{realm}/document/{uid}
-        THEN   the response status is 401 Unauthorized
+        GIVEN a completed analysis on the specimen card
+        WHEN  I read lastReport.globalStatus
+        THEN  it equals 'OK' (document is valid)
 
-        An invalid JWT should fail signature verification at the gateway.
-        ","652","TC-EC-02: Request with invalid Bearer token returns 401","tests.error_cases","2026-06-14","passed","2026-06-14","TestAuthErrors","Error Cases","",""
-"
-        GIVEN the swagger.json URL
-        WHEN  I fetch it
-        THEN  it returns valid JSON with required OpenAPI fields
-        ","1","TC-CT-01: OpenAPI spec is fetchable and valid JSON","tests.contract","2026-06-14","passed","2026-06-14","TestSchemaContract","Contract Testing","",""
-"
-        GIVEN  a token request with an incorrect client_secret
-        WHEN   I POST to the OAuth2 token endpoint
-        THEN   the response status is 401 Unauthorized
-        AND    the body contains an error field
-
-        Validates that the auth server correctly rejects bad credentials.
-        This is a separate test from API-level auth because it targets the
-        OpenID Connect layer.
-        ","396","TC-EC-03: Token endpoint with wrong credentials returns 401","tests.error_cases","2026-06-14","passed","2026-06-14","TestAuthErrors","Error Cases","",""
-"
-        GIVEN a POST /file?synchronous=true request
-        WHEN  the response is 201 Created
-        THEN  the response body conforms to the FileSummary schema in swagger.json
-        ","1815","TC-CT-02: FileSummary response conforms to OpenAPI schema","tests.contract","2026-06-14","passed","2026-06-14","TestSchemaContract","Contract Testing","",""
+        globalStatus values: OK = valid, KO = invalid/rejected
+        ","0","TC-FA-04: Document validity globalStatus = OK","tests.field_assertions","2026-06-16","passed","2026-06-16","TestExtractedFields","Field Assertions","",""
 "
         GIVEN a completed analysis report
-        WHEN  I read lastReport.persons[0].identityData.lastName.value
-        THEN  the value equals 'MARTIN' (as printed on the specimen card)
-        ","0","TC-FA-01: Extracted last name = MARTIN","tests.field_assertions","2026-06-14","passed","2026-06-14","TestExtractedFields","Field Assertions","",""
-"
-        GIVEN a FINAL analysis report
-        WHEN  I GET /document/{uid}
-        THEN  the full response body conforms to the DocumentResponse schema
-        ","515","TC-CT-04: Full DocumentResponse conforms to OpenAPI schema after analysis","tests.contract","2026-06-14","passed","2026-06-14","TestSchemaContract","Contract Testing","",""
-"
-        GIVEN  an authenticated request
-        WHEN   I POST /document with an empty JSON body {}
-        THEN   the response is a client error (4xx)
+        WHEN  I read lastReport.globalStatus
+        THEN  it contains a recognised verdict: OK or KO
 
-        An empty body lacks the required `type` field. The API should
-        reject it with 400 Bad Request or 422 Unprocessable Entity.
-        ","390","TC-EC-06: Create document with empty body returns 400","tests.error_cases","2026-06-14","passed","2026-06-14","TestInvalidInputErrors","Error Cases","",""
-"
-        GIVEN a completed analysis report
-        THEN  lastReport.persons contains at least one person
-        AND   lastReport.checks contains validation results
-
-        The core value of IDcheck is data extraction. An empty persons list
-        on a readable ID card signals an OCR or classification regression.
-        ","1","TC-HP-05: Analysis extracts identity data fields","tests.happy_path","2026-06-14","passed","2026-06-14","TestHappyPath","Happy Path","",""
-"
-        GIVEN  no Authorization header
-        WHEN   I GET /rest/v1/{realm}/document/{uid}
-        THEN   the response status is 401 Unauthorized
-
-        This verifies that the API gateway enforces authentication and does
-        not expose data to unauthenticated callers.
-        ","519","TC-EC-01: Request without Authorization header returns 401","tests.error_cases","2026-06-14","passed","2026-06-14","TestAuthErrors","Error Cases","",""
+        globalStatus=""OK""  → document is valid
+        globalStatus=""KO""  → document rejected
+        ","0","TC-HP-04: Analysis produces globalStatus verdict","tests.happy_path","2026-06-16","passed","2026-06-16","TestHappyPath","Happy Path","",""
 "
         GIVEN an existing document
         WHEN  POST /document/{uid}/check?synchronous=false
@@ -109,55 +85,79 @@
         trying to delete a document while analysis is in progress.
         This is correct state-machine behaviour: the document is locked
         during processing. This is documented, not a bug.
-        ","1261","TC-HP-02: Trigger analysis returns 202 Accepted","tests.happy_path","2026-06-14","passed","2026-06-14","TestHappyPath","Happy Path","",""
+        ","1406","TC-HP-02: Trigger analysis returns 202 Accepted","tests.happy_path","2026-06-16","passed","2026-06-16","TestHappyPath","Happy Path","",""
 "
-        GIVEN  a valid authenticated request
-        WHEN   I GET /document with a UID that does not exist
-        THEN   the response status is 404 Not Found
+        GIVEN  an authenticated request
+        WHEN   I POST /document with a non-base64, non-image `data` value
+        THEN   the response is a client error (4xx)
 
-        This verifies that the API does not return 200 with empty data
-        or 500 for unknown UIDs — a common API design smell.
-        ","493","TC-EC-04: GET non-existent document returns 404","tests.error_cases","2026-06-14","passed","2026-06-14","TestNotFoundErrors","Error Cases","",""
+        The API must not accept clearly invalid image data and must not
+        return 500 (which would indicate unhandled server-side exception).
+        ","581","TC-EC-07: Create document with invalid image data returns error","tests.error_cases","2026-06-16","passed","2026-06-16","TestInvalidInputErrors","Error Cases","",""
 "
-        GIVEN a completed analysis on the specimen card
-        WHEN  I read lastReport.globalStatus
-        THEN  it equals 'OK' (document is valid)
-
-        globalStatus values: OK = valid, KO = invalid/rejected
-        ","1","TC-FA-04: Document validity globalStatus = OK","tests.field_assertions","2026-06-14","passed","2026-06-14","TestExtractedFields","Field Assertions","",""
+        GIVEN a completed analysis
+        WHEN  I read lastReport.info.expirationDate.value
+        THEN  it equals '11/02/2030'
+        AND   expirationDate.year = 2030 (document is not expired)
+        ","0","TC-FA-05: Expiration date = 11/02/2030","tests.field_assertions","2026-06-16","passed","2026-06-16","TestExtractedFields","Field Assertions","",""
 "
         GIVEN a completed analysis report
         WHEN  I read lastReport.persons[0].identityData.firstNames.values
         THEN  the list contains 'Maëlys-Gaëlle' and 'Marie'
-        ","0","TC-FA-02: Extracted first names contain Maëlys-Gaëlle and Marie","tests.field_assertions","2026-06-14","passed","2026-06-14","TestExtractedFields","Field Assertions","",""
+        ","0","TC-FA-02: Extracted first names contain Maëlys-Gaëlle and Marie","tests.field_assertions","2026-06-16","passed","2026-06-16","TestExtractedFields","Field Assertions","",""
 "
-        GIVEN a completed analysis
-        WHEN  I read lastReport.info.documentNumber.value
-        THEN  it equals 'X4RTBPFW4' (as printed on the specimen card)
-        ","0","TC-FA-03: Extracted document number = X4RTBPFW4","tests.field_assertions","2026-06-14","passed","2026-06-14","TestExtractedFields","Field Assertions","",""
+        GIVEN a POST /document?synchronous=true request
+        WHEN  the response is 201 Created
+        THEN  the response body conforms to DocumentSummary schema
+        ","1617","TC-CT-03: DocumentSummary response conforms to OpenAPI schema","tests.contract","2026-06-16","passed","2026-06-16","TestSchemaContract","Contract Testing","",""
+"
+        GIVEN  a token request with an incorrect client_secret
+        WHEN   I POST to the OAuth2 token endpoint
+        THEN   the response status is 401 Unauthorized
+        AND    the body contains an error field
+
+        Validates that the auth server correctly rejects bad credentials.
+        This is a separate test from API-level auth because it targets the
+        OpenID Connect layer.
+        ","602","TC-EC-03: Token endpoint with wrong credentials returns 401","tests.error_cases","2026-06-16","passed","2026-06-16","TestAuthErrors","Error Cases","",""
 "
         GIVEN a completed analysis report
-        WHEN  I read lastReport.globalStatus
-        THEN  it contains a recognised verdict: OK or KO
+        THEN  lastReport.persons contains at least one person
+        AND   lastReport.checks contains validation results
 
-        globalStatus=""OK""  → document is valid
-        globalStatus=""KO""  → document rejected
-        ","0","TC-HP-04: Analysis produces globalStatus verdict","tests.happy_path","2026-06-14","passed","2026-06-14","TestHappyPath","Happy Path","",""
+        The core value of IDcheck is data extraction. An empty persons list
+        on a readable ID card signals an OCR or classification regression.
+        ","0","TC-HP-05: Analysis extracts identity data fields","tests.happy_path","2026-06-16","passed","2026-06-16","TestHappyPath","Happy Path","",""
 "
-        GIVEN a completed analysis
-        WHEN  I read lastReport.info.extra[] where key starts with MRZ_LINE
-        THEN  MRZ line 3 contains 'MARTIN' and 'MAELYS'
-        ","1","TC-FA-06: MRZ lines are extracted and correct","tests.field_assertions","2026-06-14","passed","2026-06-14","TestExtractedFields","Field Assertions","",""
+        GIVEN a completed analysis report
+        WHEN  I read lastReport.persons[0].identityData.lastName.value
+        THEN  the value equals 'MARTIN' (as printed on the specimen card)
+        ","0","TC-FA-01: Extracted last name = MARTIN","tests.field_assertions","2026-06-16","passed","2026-06-16","TestExtractedFields","Field Assertions","",""
 "
-        GIVEN a valid ID card image (recto + verso)
-        WHEN  POST /document?synchronous=true
-        THEN  201 Created with a non-empty UID string
-        ","1188","TC-HP-01: Create document returns 201 with a UID","tests.happy_path","2026-06-14","passed","2026-06-14","TestHappyPath","Happy Path","",""
-"
-        GIVEN  a request without authentication
-        WHEN   the API returns 401
-        THEN   the response body is valid JSON (not HTML or plain text)
+        GIVEN a submitted document with analysis triggered
+        WHEN  polling until lastAnalysisStatus == OK
+        THEN  the document is complete and lastReport is populated
 
-        Structured error responses are essential for client-side error handling.
-        An HTML error page or plain-text message would break API consumers.
-        ","507","TC-CT-05: Error response for unauthorised request is structured","tests.contract","2026-06-14","passed","2026-06-14","TestSchemaContract","Contract Testing","",""
+        The IDcheck API uses lastAnalysisStatus=""OK"" (not a ""FINAL"" state)
+        to signal that analysis is complete and results are available.
+        ","0","TC-HP-03: Analysis completes with lastAnalysisStatus=OK","tests.happy_path","2026-06-16","passed","2026-06-16","TestHappyPath","Happy Path","",""
+"
+        GIVEN  an Authorization header with a forged/invalid Bearer token
+        WHEN   I GET /rest/v1/{realm}/document/{uid}
+        THEN   the response status is 401 Unauthorized
+
+        An invalid JWT should fail signature verification at the gateway.
+        ","587","TC-EC-02: Request with invalid Bearer token returns 401","tests.error_cases","2026-06-16","passed","2026-06-16","TestAuthErrors","Error Cases","",""
+"
+        GIVEN  an authenticated request
+        WHEN   I POST /document with an empty JSON body {}
+        THEN   the response is a client error (4xx)
+
+        An empty body lacks the required `type` field. The API should
+        reject it with 400 Bad Request or 422 Unprocessable Entity.
+        ","527","TC-EC-06: Create document with empty body returns 400","tests.error_cases","2026-06-16","passed","2026-06-16","TestInvalidInputErrors","Error Cases","",""
+"
+        GIVEN a FINAL analysis report
+        WHEN  I GET /document/{uid}
+        THEN  the full response body conforms to the DocumentResponse schema
+        ","695","TC-CT-04: Full DocumentResponse conforms to OpenAPI schema after analysis","tests.contract","2026-06-16","passed","2026-06-16","TestSchemaContract","Contract Testing","",""

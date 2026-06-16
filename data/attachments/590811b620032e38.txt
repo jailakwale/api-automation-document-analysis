@@ -1,1 +1,0 @@
-17:50:10 | INFO     | httpx | HTTP Request: POST https://sso.idcheck-sandbox.ariadnext.io/auth/realms/customer-identity/protocol/openid-connect/token "HTTP/1.1 401 Unauthorized"
